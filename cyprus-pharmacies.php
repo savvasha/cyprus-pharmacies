@@ -9,9 +9,11 @@ Requires at least: 5.3
 Requires PHP: 7.2
 License: GPL v2 or later
 License URI: https://www.gnu.org/licenses/gpl.html
+ *
+@package Cyprus Pharmacies
  */
 
-// Exit if accessed directly
+// Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -30,10 +32,10 @@ if ( ! class_exists( 'Cyprus_Pharmacies' ) ) :
 		 * Constructor
 		 */
 		public function __construct() {
-			// Define constants
+			// Define constants.
 			$this->define_constants();
 
-			// Include required files
+			// Include required files.
 			$this->includes();
 
 		}
@@ -42,8 +44,8 @@ if ( ! class_exists( 'Cyprus_Pharmacies' ) ) :
 		 * Define constants
 		 */
 		private function define_constants() {
-			if ( ! defined( 'cypharm_PLUGIN_BASE' ) ) {
-				define( 'cypharm_PLUGIN_BASE', plugin_basename( __FILE__ ) );
+			if ( ! defined( 'CYPHARM_PLUGIN_BASE' ) ) {
+				define( 'CYPHARM_PLUGIN_BASE', plugin_basename( __FILE__ ) );
 			}
 		}
 
@@ -51,7 +53,7 @@ if ( ! class_exists( 'Cyprus_Pharmacies' ) ) :
 		 * Include required files
 		 */
 		private function includes() {
-			// load the needed frontend files
+			// load the needed frontend files.
 			include dirname( __FILE__ ) . '/includes/class-cypharm-front.php';
 		}
 	}
