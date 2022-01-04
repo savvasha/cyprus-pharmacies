@@ -7,7 +7,7 @@ Tested up to: 5.8.1
 Requires PHP: 5.6.40
 Stable tag: 1.0.0
 
-Show all-night pharmacies of Cyprus
+Show all-night today and tomorrow pharmacies of Cyprus
 
 == Description ==
 An easy way to show the all-night today and tomorrow pharmacies of Cyprus per city (Nicosia, Limassol, Larnaca, Paralimni, Paphos).
