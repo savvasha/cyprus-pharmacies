@@ -34,9 +34,12 @@ class CyPharm_Front {
 			'cypharm'
 		);
 
+		if ( 'Pafos' === $atts['city'] ) {
+			$atts['city'] = 'Paphos';
+		}
+
 		$cities_ids = array(
 			'Paphos'    => 'f2a52fa8-7132-4cf2-b897-beb7e0cb4250',
-			'Pafos'     => 'f2a52fa8-7132-4cf2-b897-beb7e0cb4250',
 			'Limassol'  => '747a375f-4848-4fd0-82cf-509ea5cf72ae',
 			'Nicosia'   => '2eef2142-75f6-496e-83d4-157e7cb00eeb',
 			'Larnaca'   => '84f26551-984e-419a-88ee-200a1a3aea44',
@@ -77,6 +80,8 @@ class CyPharm_Front {
 
 		$greekmonths = array( 'Ιανουαρίου', 'Φεβρουαρίου', 'Μαρτίου', 'Απριλίου', 'Μαΐου', 'Ιουνίου', 'Ιουλίου', 'Αυγούστου', 'Σεπτεμβρίου', 'Οκτωβρίου', 'Νοεμβρίου', 'Δεκεμβρίου' );
 
+		$coordinates = CyPharm_Coordinates::$coordinates;
+
 		$output = '';
 
 		// Show title.
@@ -88,9 +93,16 @@ class CyPharm_Front {
 		// Show today pharmacies.
 		$output .= '<h3>' . date_i18n( 'l' ) . ' , ' . date_i18n( 'j' ) . ' ' . $greekmonths[ date_i18n( 'n' ) - 1 ] . ' <h3>';
 		foreach ( $today_pharmacies as $today_pharmacy ) {
+			if ( isset( $coordinates[ $atts['city'] ][ $today_pharmacy->reg_no ] ) ) {
+				$lat              = $coordinates[ $atts['city'] ][ $today_pharmacy->reg_no ]['Latitude'];
+				$long             = $coordinates[ $atts['city'] ][ $today_pharmacy->reg_no ]['Longitude'];
+				$pharmacy_address = '<a href="http://www.google.com/maps/place/' . $lat . ',' . $long . '" target="_blank">' . $today_pharmacy->address . '</a>';
+			} else {
+				$pharmacy_address = $today_pharmacy->address;
+			}
 			$output .= '<h4>' . $today_pharmacy->surmame . ' ' . $today_pharmacy->name . '</h4>';
 			$output .= '<ul>';
-			$output .= '<li><strong>Διεύθυνση</strong>: ' . $today_pharmacy->address . '</li>';
+			$output .= '<li><strong>Διεύθυνση</strong>: ' . $pharmacy_address . '</li>';
 			$output .= '<li><strong>Περιοχή</strong>: ' . $today_pharmacy->additional_address_info . '</li>';
 			$output .= '<li><strong>Δήμος/Κοινότητα</strong>: ' . $today_pharmacy->muniuciplity__community . '</li>';
 			$output .= '<li><strong>Τηλέφωνο Φαρμακείου</strong>: <a href="tel:' . $today_pharmacy->pharmacy_tel_no . '"> ' . $today_pharmacy->pharmacy_tel_no . ' </a></li>';
@@ -103,9 +115,16 @@ class CyPharm_Front {
 		// Show tomorrow pharmacies.
 		$output .= '<h3>' . date_i18n( 'l', strtotime( '+1 day' ) ) . ' , ' . date_i18n( 'j', strtotime( '+1 day' ) ) . ' ' . $greekmonths[ date_i18n( 'n', strtotime( '+1 day' ) ) - 1 ] . ' <h3>';
 		foreach ( $tomorrow_pharmacies as $tomorrow_pharmacy ) {
+			if ( isset( $coordinates[ $atts['city'] ][ $tomorrow_pharmacy->reg_no ] ) ) {
+				$lat              = $coordinates[ $atts['city'] ][ $tomorrow_pharmacy->reg_no ]['Latitude'];
+				$long             = $coordinates[ $atts['city'] ][ $tomorrow_pharmacy->reg_no ]['Longitude'];
+				$pharmacy_address = '<a href="http://www.google.com/maps/place/' . $lat . ',' . $long . '" target="_blank">' . $tomorrow_pharmacy->address . '</a>';
+			} else {
+				$pharmacy_address = $tomorrow_pharmacy->address;
+			}
 			$output .= '<h4>' . $tomorrow_pharmacy->surmame . ' ' . $tomorrow_pharmacy->name . '</h4>';
 			$output .= '<ul>';
-			$output .= '<li><strong>Διεύθυνση</strong>: ' . $tomorrow_pharmacy->address . '</li>';
+			$output .= '<li><strong>Διεύθυνση</strong>: ' . $pharmacy_address . '</li>';
 			$output .= '<li><strong>Περιοχή</strong>: ' . $tomorrow_pharmacy->additional_address_info . '</li>';
 			$output .= '<li><strong>Δήμος/Κοινότητα</strong>: ' . $tomorrow_pharmacy->muniuciplity__community . '</li>';
 			$output .= '<li><strong>Τηλέφωνο Φαρμακείου</strong>: <a href="tel:' . $tomorrow_pharmacy->pharmacy_tel_no . '"> ' . $tomorrow_pharmacy->pharmacy_tel_no . ' </a></li>';

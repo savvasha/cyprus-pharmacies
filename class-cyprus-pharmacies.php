@@ -55,6 +55,8 @@ if ( ! class_exists( 'Cyprus_Pharmacies' ) ) :
 		private function includes() {
 			// load the needed frontend files.
 			include dirname( __FILE__ ) . '/includes/class-cypharm-front.php';
+			// load the needed coordinates.
+			include dirname( __FILE__ ) . '/includes/class-cypharm-coordinates.php';
 		}
 	}
 
