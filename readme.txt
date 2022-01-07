@@ -5,7 +5,7 @@ Tags: Cyprus, pharmacy, pharmacies, greek
 Requires at least: 5.3
 Tested up to: 5.8.1
 Requires PHP: 5.6.40
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 
 Show all-night today and tomorrow pharmacies of Cyprus
 
@@ -20,7 +20,7 @@ A simple example
 
 The plugin supports the following optional parameters:
 
-* `city`: select the Cyprus city like Limassol, Paphos, Nicosia etc. (defaults to `Paphos`)
+* `city`: select the Cyprus city between Nicosia, Limassol, Larnaca, Paralimni and Paphos (defaults to `Paphos`)
 * `title`: Choose a custom title to use (defaults to `false`)
 
 = Credits =
@@ -32,6 +32,10 @@ The plugin supports the following optional parameters:
 1.  The all-night pharmacies of Paphos for 4th and 5th of January
 
 == Changelog ==
+
+= 1.1.0 =
+
+* FIX: Wrong community and telephone numbers
 
 = 1.1.0 =
 
