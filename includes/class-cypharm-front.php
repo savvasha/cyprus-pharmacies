@@ -124,7 +124,7 @@ class CyPharm_Front {
 			} else {
 				$pharmacy_address = $today_pharmacy->address;
 			}
-			$output .= '<h4>' . $today_pharmacy->surmame . ' ' . $today_pharmacy->name . '</h4>';
+			$output .= '<h4>' . $today_pharmacy->surname . ' ' . $today_pharmacy->name . '</h4>';
 			$output .= '<ul>';
 			$output .= '<li><strong>Διεύθυνση</strong>: ' . $pharmacy_address . '</li>';
 			$output .= '<li><strong>Περιοχή</strong>: ' . $today_pharmacy->additional_address_info . '</li>';
@@ -167,7 +167,7 @@ class CyPharm_Front {
 			} else {
 				$pharmacy_address = $tomorrow_pharmacy->address;
 			}
-			$output .= '<h4>' . $tomorrow_pharmacy->surmame . ' ' . $tomorrow_pharmacy->name . '</h4>';
+			$output .= '<h4>' . $tomorrow_pharmacy->surname . ' ' . $tomorrow_pharmacy->name . '</h4>';
 			$output .= '<ul>';
 			$output .= '<li><strong>Διεύθυνση</strong>: ' . $pharmacy_address . '</li>';
 			$output .= '<li><strong>Περιοχή</strong>: ' . $tomorrow_pharmacy->additional_address_info . '</li>';
