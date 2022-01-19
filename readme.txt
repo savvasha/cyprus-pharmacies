@@ -25,7 +25,7 @@ The plugin supports the following optional parameters:
 
 = Credits =
 
-* [Εθνική Διαδικτυακή Πύλη Ανοικτών Δεδομένων](https://www.data.gov.cy/)
+* [National Opendata Portal](https://www.data.gov.cy/)
 
 == Screenshots ==
 
