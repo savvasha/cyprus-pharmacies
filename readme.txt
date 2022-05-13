@@ -3,7 +3,7 @@ Contributors: savvasha
 License: GPLv2 or later
 Tags: Cyprus, pharmacy, pharmacies, greek
 Requires at least: 5.3
-Tested up to: 5.8.1
+Tested up to: 6.0
 Requires PHP: 5.6.40
 Stable tag: 1.1.2
 
