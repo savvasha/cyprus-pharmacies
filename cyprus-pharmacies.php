@@ -29,6 +29,8 @@ if ( ! defined( 'CYPHARM_PLUGIN_BASE' ) ) {
 /**
  * Include required files
  */
+// load the needed data files.
+require dirname( __FILE__ ) . '/includes/class-cypharm-data.php';
 // load the needed frontend files.
 require dirname( __FILE__ ) . '/includes/class-cypharm-front.php';
 // load the needed coordinates.
