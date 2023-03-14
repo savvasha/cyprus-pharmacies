@@ -38,17 +38,17 @@ class CyPharm_Front {
 			$atts['city'] = 'Paphos';
 		}
 
-		//Initialize Pharmacy Data Class.
-		$cypharm = new CyPharm_Data;
-		
+		// Initialize Pharmacy Data Class.
+		$cypharm = new CyPharm_Data();
+
 		// Get today pharmacies.
-		$cypharm->date = gmdate( 'j/n/Y' );
-		$cypharm->city = $atts['city'];
+		$cypharm->date    = gmdate( 'j/n/Y' );
+		$cypharm->city    = $atts['city'];
 		$today_pharmacies = $cypharm->data();
 
 		// Get tomorrow pharmacies.
-		$cypharm->date = gmdate( 'j/n/Y', strtotime( '+1 day' ) );
-		$cypharm->city = $atts['city'];
+		$cypharm->date       = gmdate( 'j/n/Y', strtotime( '+1 day' ) );
+		$cypharm->city       = $atts['city'];
 		$tomorrow_pharmacies = $cypharm->data();
 
 		// Get available coordinates.
@@ -75,11 +75,11 @@ class CyPharm_Front {
 			}
 			$output .= '<h4>' . $today_pharmacy->surname . ' ' . $today_pharmacy->name . '</h4>';
 			$output .= '<ul>';
-			$output .= '<li><strong>' . esc_html__( 'Address:' , 'cyprus-pharmacies' ) . '</strong> ' . $pharmacy_address . '</li>';
-			$output .= '<li><strong>' . esc_html__( 'Additional Address info:' , 'cyprus-pharmacies' ) . '</strong> ' . $today_pharmacy->additional_address . '</li>';
-			$output .= '<li><strong>' . esc_html__( 'Municipality/Community:' , 'cyprus-pharmacies' ) . '</strong> ' . $today_pharmacy->municipalitycommunity . '</li>';
-			$output .= '<li><strong>' . esc_html__( 'Pharmacy Telephone:' , 'cyprus-pharmacies' ) . '</strong> <a href="tel:' . $today_pharmacy->pharmacy_tel_no . '"> ' . $today_pharmacy->pharmacy_tel_no . ' </a></li>';
-			$output .= '<li><strong>' . esc_html__( 'Home Telephone:' , 'cyprus-pharmacies' ) . '</strong> <a href="tel:' . $today_pharmacy->house_tel_no . '"> ' . $today_pharmacy->house_tel_no . ' </a></li>';
+			$output .= '<li><strong>' . esc_html__( 'Address:', 'cyprus-pharmacies' ) . '</strong> ' . $pharmacy_address . '</li>';
+			$output .= '<li><strong>' . esc_html__( 'Additional Address info:', 'cyprus-pharmacies' ) . '</strong> ' . $today_pharmacy->additional_address . '</li>';
+			$output .= '<li><strong>' . esc_html__( 'Municipality/Community:', 'cyprus-pharmacies' ) . '</strong> ' . $today_pharmacy->municipalitycommunity . '</li>';
+			$output .= '<li><strong>' . esc_html__( 'Pharmacy Telephone:', 'cyprus-pharmacies' ) . '</strong> <a href="tel:' . $today_pharmacy->pharmacy_tel_no . '"> ' . $today_pharmacy->pharmacy_tel_no . ' </a></li>';
+			$output .= '<li><strong>' . esc_html__( 'Home Telephone:', 'cyprus-pharmacies' ) . '</strong> <a href="tel:' . $today_pharmacy->house_tel_no . '"> ' . $today_pharmacy->house_tel_no . ' </a></li>';
 			$output .= '</ul>';
 		}
 
@@ -98,11 +98,11 @@ class CyPharm_Front {
 			}
 			$output .= '<h4>' . $tomorrow_pharmacy->surname . ' ' . $tomorrow_pharmacy->name . '</h4>';
 			$output .= '<ul>';
-			$output .= '<li><strong>' . esc_html__( 'Address:' , 'cyprus-pharmacies' ) . '</strong> ' . $pharmacy_address . '</li>';
-			$output .= '<li><strong>' . esc_html__( 'Additional Address info:' , 'cyprus-pharmacies' ) . '</strong> ' . $tomorrow_pharmacy->additional_address . '</li>';
-			$output .= '<li><strong>' . esc_html__( 'Municipality/Community:' , 'cyprus-pharmacies' ) . '</strong> ' . $tomorrow_pharmacy->municipalitycommunity . '</li>';
-			$output .= '<li><strong>' . esc_html__( 'Pharmacy Telephone:' , 'cyprus-pharmacies' ) . '</strong> <a href="tel:' . $tomorrow_pharmacy->pharmacy_tel_no . '"> ' . $tomorrow_pharmacy->pharmacy_tel_no . ' </a></li>';
-			$output .= '<li><strong>' . esc_html__( 'Home Telephone:' , 'cyprus-pharmacies' ) . '</strong> <a href="tel:' . $tomorrow_pharmacy->house_tel_no . '"> ' . $tomorrow_pharmacy->house_tel_no . ' </a></li>';
+			$output .= '<li><strong>' . esc_html__( 'Address:', 'cyprus-pharmacies' ) . '</strong> ' . $pharmacy_address . '</li>';
+			$output .= '<li><strong>' . esc_html__( 'Additional Address info:', 'cyprus-pharmacies' ) . '</strong> ' . $tomorrow_pharmacy->additional_address . '</li>';
+			$output .= '<li><strong>' . esc_html__( 'Municipality/Community:', 'cyprus-pharmacies' ) . '</strong> ' . $tomorrow_pharmacy->municipalitycommunity . '</li>';
+			$output .= '<li><strong>' . esc_html__( 'Pharmacy Telephone:', 'cyprus-pharmacies' ) . '</strong> <a href="tel:' . $tomorrow_pharmacy->pharmacy_tel_no . '"> ' . $tomorrow_pharmacy->pharmacy_tel_no . ' </a></li>';
+			$output .= '<li><strong>' . esc_html__( 'Home Telephone:', 'cyprus-pharmacies' ) . '</strong> <a href="tel:' . $tomorrow_pharmacy->house_tel_no . '"> ' . $tomorrow_pharmacy->house_tel_no . ' </a></li>';
 			$output .= '</ul>';
 		}
 
