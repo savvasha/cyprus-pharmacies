@@ -3,9 +3,9 @@
 Plugin Name: Cyprus Pharmacies
 Description: An easy way to show the all-night pharmacies of Cyprus per city.
 Author: Savvas
-Author URI: https://profiles.wordpress.org/savvasha/
+Author URI: https://savvasha.com
 Text Domain: cyprus-pharmacies
-Version: 1.1.2
+Version: 1.2.0
 Requires at least: 5.3
 Requires PHP: 7.2
 License: GPL v2 or later
