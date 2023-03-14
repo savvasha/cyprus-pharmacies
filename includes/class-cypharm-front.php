@@ -126,8 +126,8 @@ class CyPharm_Front {
 			}
 			$output .= '<h4>' . $today_pharmacy->surname . ' ' . $today_pharmacy->name . '</h4>';
 			$output .= '<ul>';
-			$output .= '<li><strong>Διεύθυνση</strong>: ' . $pharmacy_address . '</li>';
-			$output .= '<li><strong>Περιοχή</strong>: ' . $today_pharmacy->additional_address_info . '</li>';
+			$output .= '<li><strong>' . esc_html__( 'Address:' , 'cyprus-pharmacies' ) . '</strong> ' . $pharmacy_address . '</li>';
+			$output .= '<li><strong>' . esc_html__( 'Additional Address info:' , 'cyprus-pharmacies' ) . '</strong> ' . $today_pharmacy->additional_address_info . '</li>';
 			// Temporary code to receive the correct data of the pharmacies.
 			$municipalitycommunity = null;
 			if ( isset( $pharmacies[ $today_pharmacy->reg_no ] ) ) {
@@ -138,7 +138,7 @@ class CyPharm_Front {
 				$municipalitycommunity = $today_pharmacy->municipality_community;
 			}
 			// End temporary code.
-			$output .= '<li><strong>Δήμος/Κοινότητα</strong>: ' . $municipalitycommunity . '</li>';
+			$output .= '<li><strong>' . esc_html__( 'Municipality/Community:' , 'cyprus-pharmacies' ) . '</strong> ' . $municipalitycommunity . '</li>';
 			// Temporary code to receive the correct data of the pharmacies.
 			if ( isset( $pharmacies[ $today_pharmacy->reg_no ] ) ) {
 				$pharmacy_tel_no = $pharmacies[ $today_pharmacy->reg_no ]['pharmacy_tel_no'];
@@ -146,7 +146,7 @@ class CyPharm_Front {
 				$pharmacy_tel_no = $today_pharmacy->pharmacy_tel_no;
 			}
 			// End temporary code.
-			$output .= '<li><strong>Τηλέφωνο Φαρμακείου</strong>: <a href="tel:' . $pharmacy_tel_no . '"> ' . $pharmacy_tel_no . ' </a></li>';
+			$output .= '<li><strong>' . esc_html__( 'Pharmacy Telephone:' , 'cyprus-pharmacies' ) . '</strong> <a href="tel:' . $pharmacy_tel_no . '"> ' . $pharmacy_tel_no . ' </a></li>';
 			// Temporary code to receive the correct data of the pharmacies.
 			$house_tel_no = null;
 			if ( isset( $pharmacies[ $today_pharmacy->reg_no ] ) ) {
@@ -157,7 +157,7 @@ class CyPharm_Front {
 				$house_tel_no = $today_pharmacy->house_tel_no;
 			}
 			// End temporary code.
-			$output .= '<li><strong>Τηλέφωνο Οικίας</strong>: <a href="tel:' . $house_tel_no . '"> ' . $house_tel_no . ' </a></li>';
+			$output .= '<li><strong>' . esc_html__( 'Home Telephone:' , 'cyprus-pharmacies' ) . '</strong> <a href="tel:' . $house_tel_no . '"> ' . $house_tel_no . ' </a></li>';
 			$output .= '</ul>';
 		}
 
@@ -175,8 +175,8 @@ class CyPharm_Front {
 			}
 			$output .= '<h4>' . $tomorrow_pharmacy->surname . ' ' . $tomorrow_pharmacy->name . '</h4>';
 			$output .= '<ul>';
-			$output .= '<li><strong>Διεύθυνση</strong>: ' . $pharmacy_address . '</li>';
-			$output .= '<li><strong>Περιοχή</strong>: ' . $tomorrow_pharmacy->additional_address_info . '</li>';
+			$output .= '<li><strong>' . esc_html__( 'Address:' , 'cyprus-pharmacies' ) . '</strong> ' . $pharmacy_address . '</li>';
+			$output .= '<li><strong>' . esc_html__( 'Additional Address info:' , 'cyprus-pharmacies' ) . '</strong> ' . $tomorrow_pharmacy->additional_address_info . '</li>';
 			// Temporary code to receive the correct data of the pharmacies.
 			$municipalitycommunity = null;
 			if ( isset( $pharmacies[ $tomorrow_pharmacy->reg_no ] ) ) {
@@ -187,7 +187,7 @@ class CyPharm_Front {
 				$municipalitycommunity = $tomorrow_pharmacy->municipality_community;
 			}
 			// End temporary code.
-			$output .= '<li><strong>Δήμος/Κοινότητα</strong>: ' . $municipalitycommunity . '</li>';
+			$output .= '<li><strong>' . esc_html__( 'Municipality/Community:' , 'cyprus-pharmacies' ) . '</strong> ' . $municipalitycommunity . '</li>';
 			// Temporary code to receive the correct data of the pharmacies.
 			if ( isset( $pharmacies[ $tomorrow_pharmacy->reg_no ] ) ) {
 				$pharmacy_tel_no = $pharmacies[ $tomorrow_pharmacy->reg_no ]['pharmacy_tel_no'];
@@ -195,7 +195,7 @@ class CyPharm_Front {
 				$pharmacy_tel_no = $tomorrow_pharmacy->pharmacy_tel_no;
 			}
 			// End temporary code.
-			$output .= '<li><strong>Τηλέφωνο Φαρμακείου</strong>: <a href="tel:' . $pharmacy_tel_no . '"> ' . $pharmacy_tel_no . ' </a></li>';
+			$output .= '<li><strong>' . esc_html__( 'Pharmacy Telephone:' , 'cyprus-pharmacies' ) . '</strong> <a href="tel:' . $pharmacy_tel_no . '"> ' . $pharmacy_tel_no . ' </a></li>';
 			// Temporary code to receive the correct data of the pharmacies.
 			$house_tel_no = null;
 			if ( isset( $pharmacies[ $tomorrow_pharmacy->reg_no ] ) ) {
@@ -206,7 +206,7 @@ class CyPharm_Front {
 				$house_tel_no = $tomorrow_pharmacy->house_tel_no;
 			}
 			// End temporary code.
-			$output .= '<li><strong>Τηλέφωνο Οικίας</strong>: <a href="tel:' . $house_tel_no . '"> ' . $house_tel_no . ' </a></li>';
+			$output .= '<li><strong>' . esc_html__( 'Home Telephone:' , 'cyprus-pharmacies' ) . '</strong> <a href="tel:' . $house_tel_no . '"> ' . $house_tel_no . ' </a></li>';
 			$output .= '</ul>';
 		}
 
