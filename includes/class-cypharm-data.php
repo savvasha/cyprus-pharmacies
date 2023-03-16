@@ -102,7 +102,8 @@ class CyPharm_Data {
 			$pharmacies[ $temp_pharmacy->reg_no ] = $temp_pharmacy;
 		}
 
-		return $pharmacies;
+		return apply_filters( 'cypharm_pharmacies', $pharmacies, $pharms_ids );
+
 	}
 
 }
