@@ -3,9 +3,9 @@ Contributors: savvasha
 License: GPLv2 or later
 Tags: Cyprus, pharmacy, pharmacies, greek
 Requires at least: 5.3
-Tested up to: 6.3
+Tested up to: 6.5
 Requires PHP: 5.6.40
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 
 Show all-night today and tomorrow pharmacies of Cyprus
 
@@ -32,6 +32,10 @@ The plugin supports the following optional parameters:
 1.  The all-night pharmacies of Paphos for 4th and 5th of January
 
 == Changelog ==
+
+= 1.2.2 =
+
+* Fix: data.gov schema was changed.
 
 = 1.2.1 =
 

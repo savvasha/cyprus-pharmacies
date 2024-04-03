@@ -42,12 +42,12 @@ class CyPharm_Front {
 		$cypharm = new CyPharm_Data();
 
 		// Get today pharmacies.
-		$cypharm->date    = gmdate( 'j/n/Y' );
+		$cypharm->date    = gmdate( 'j/n/y' );
 		$cypharm->city    = $atts['city'];
 		$today_pharmacies = $cypharm->data();
 
 		// Get tomorrow pharmacies.
-		$cypharm->date       = gmdate( 'j/n/Y', strtotime( '+1 day' ) );
+		$cypharm->date       = gmdate( 'j/n/y', strtotime( '+1 day' ) );
 		$cypharm->city       = $atts['city'];
 		$tomorrow_pharmacies = $cypharm->data();
 

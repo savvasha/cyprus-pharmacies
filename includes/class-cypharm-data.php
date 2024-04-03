@@ -54,21 +54,21 @@ class CyPharm_Data {
 		} else {
 			return $cyphar_data;
 		}
+		
 
 		$date = $this->date;
 
 		$url      = $main_url . '&filters[date]=' . $date;
 		$response = wp_remote_get( $url, array( 'timeout' => 15 ) );
+
 		if ( ! is_wp_error( $response ) ) {
 			$contents   = wp_remote_retrieve_body( $response );
 			$results    = json_decode( $contents );
 			$pharmacies = $results->result->records;
 		}
-
 		foreach ( $pharmacies as $pharmacy ) {
-			$pharmacies_ids[] = $pharmacy->reg_no;
+			$pharmacies_ids[] = $pharmacy->reg__no_;
 		}
-
 		$data = $this->cypharms( $pharmacies_ids );
 
 		return $data;
@@ -90,7 +90,7 @@ class CyPharm_Data {
 		}
 
 		$temp_pharmacies = array();
-		$url             = 'https://www.data.gov.cy/api/action/datastore/search.json?resource_id=82326f44-28f8-4de8-9367-2f6148db02f7&limit=1000&filters[reg_no]=' . $ids;
+		$url             = 'https://www.data.gov.cy/api/action/datastore/search.json?resource_id=82326f44-28f8-4de8-9367-2f6148db02f7&limit=1000&filters[reg_no_]=' . $ids;
 		$response        = wp_remote_get( $url, array( 'timeout' => 15 ) );
 		if ( ! is_wp_error( $response ) ) {
 			$contents        = wp_remote_retrieve_body( $response );
@@ -99,7 +99,7 @@ class CyPharm_Data {
 		}
 		$pharmacies = array();
 		foreach ( $temp_pharmacies as $temp_pharmacy ) {
-			$pharmacies[ $temp_pharmacy->reg_no ] = $temp_pharmacy;
+			$pharmacies[ $temp_pharmacy->reg_no_ ] = $temp_pharmacy;
 		}
 
 		return apply_filters( 'cypharm_pharmacies', $pharmacies, $pharms_ids );
