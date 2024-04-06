@@ -42,12 +42,12 @@ class CyPharm_Front {
 		$cypharm = new CyPharm_Data();
 
 		// Get today pharmacies.
-		$cypharm->date    = gmdate( 'j/n/y' );
+		$cypharm->date    = gmdate( 'j/n/Y' ) . ',' . gmdate( 'j/n/y' ) . ',' . gmdate( 'd/m/y' ) . ',' . gmdate( 'd/m/Y' );
 		$cypharm->city    = $atts['city'];
 		$today_pharmacies = $cypharm->data();
 
 		// Get tomorrow pharmacies.
-		$cypharm->date       = gmdate( 'j/n/y', strtotime( '+1 day' ) );
+		$cypharm->date       = gmdate( 'j/n/Y', strtotime( '+1 day' ) ) . ',' . gmdate( 'j/n/y', strtotime( '+1 day' ) ) . ',' . gmdate( 'd/m/y', strtotime( '+1 day' ) ) . ',' . gmdate( 'd/m/Y', strtotime( '+1 day' ) );
 		$cypharm->city       = $atts['city'];
 		$tomorrow_pharmacies = $cypharm->data();
 
@@ -66,9 +66,9 @@ class CyPharm_Front {
 		$output .= '<h3>' . date_i18n( 'l' ) . ' , ' . date_i18n( 'j' ) . ' ' . date_i18n( 'M' ) . ' ' . date_i18n( 'Y' ) . '<h3>';
 
 		foreach ( $today_pharmacies as $today_pharmacy ) {
-			if ( isset( $today_pharmacy->reg_no ) && isset( $coordinates[ $atts['city'] ][ $today_pharmacy->reg_no ] ) && !isset( $today_pharmacy->geolocation ) ) {
-				$lat              = $coordinates[ $atts['city'] ][ $today_pharmacy->reg_no ]['Latitude'];
-				$long             = $coordinates[ $atts['city'] ][ $today_pharmacy->reg_no ]['Longitude'];
+			if ( isset( $today_pharmacy->reg_no_ ) && isset( $coordinates[ $atts['city'] ][ $today_pharmacy->reg_no_ ] ) && !isset( $today_pharmacy->geolocation ) ) {
+				$lat              = $coordinates[ $atts['city'] ][ $today_pharmacy->reg_no_ ]['Latitude'];
+				$long             = $coordinates[ $atts['city'] ][ $today_pharmacy->reg_no_ ]['Longitude'];
 				$pharmacy_address = '<a href="http://www.google.com/maps/place/' . $lat . ',' . $long . '" target="_blank">' . $today_pharmacy->address . '</a>';
 			} else {
 				$pharmacy_address = $today_pharmacy->address;
@@ -97,9 +97,9 @@ class CyPharm_Front {
 		$output .= '<h3>' . date_i18n( 'l', strtotime( '+1 day' ) ) . ' , ' . date_i18n( 'j', strtotime( '+1 day' ) ) . ' ' . date_i18n( 'M', strtotime( '+1 day' ) ) . ' ' . date_i18n( 'Y', strtotime( '+1 day' ) ) . '<h3>';
 
 		foreach ( $tomorrow_pharmacies as $tomorrow_pharmacy ) {
-			if ( isset( $tomorrow_pharmacy->reg_no ) &&  isset( $coordinates[ $atts['city'] ][ $tomorrow_pharmacy->reg_no ] ) ) {
-				$lat              = $coordinates[ $atts['city'] ][ $tomorrow_pharmacy->reg_no ]['Latitude'];
-				$long             = $coordinates[ $atts['city'] ][ $tomorrow_pharmacy->reg_no ]['Longitude'];
+			if ( isset( $tomorrow_pharmacy->reg_no_ ) &&  isset( $coordinates[ $atts['city'] ][ $tomorrow_pharmacy->reg_no_ ] ) ) {
+				$lat              = $coordinates[ $atts['city'] ][ $tomorrow_pharmacy->reg_no_ ]['Latitude'];
+				$long             = $coordinates[ $atts['city'] ][ $tomorrow_pharmacy->reg_no_ ]['Longitude'];
 				$pharmacy_address = '<a href="http://www.google.com/maps/place/' . $lat . ',' . $long . '" target="_blank">' . $tomorrow_pharmacy->address . '</a>';
 			} else {
 				$pharmacy_address = $tomorrow_pharmacy->address;
