@@ -38,11 +38,11 @@ class CyPharm_Data {
 		$pharmacies     = array();
 		$pharmacies_ids = array();
 		$cities_ids     = array(
-			'Paphos'    => 'f2a52fa8-7132-4cf2-b897-beb7e0cb4250',
-			'Limassol'  => '747a375f-4848-4fd0-82cf-509ea5cf72ae',
-			'Nicosia'   => '2eef2142-75f6-496e-83d4-157e7cb00eeb',
-			'Larnaca'   => '84f26551-984e-419a-88ee-200a1a3aea44',
-			'Paralimni' => 'bb863934-b05d-4316-93bf-ffc8b0fb2194',
+			'Paphos'    => '802df2db-2b28-4bb3-b355-e437acdf728d',
+			'Limassol'  => '97282b19-bc01-48e4-983e-5ff65a1fb135',
+			'Nicosia'   => '468b39e8-811d-4586-8e5e-37533d801575',
+			'Larnaca'   => '84ff41ba-65b8-4ec7-9f31-8130fbe2d1b1',
+			'Paralimni' => 'cdf7ff43-1928-4e6a-a3b9-ff4228cefbfe',
 		);
 
 		// Get correct city_id.
@@ -68,7 +68,9 @@ class CyPharm_Data {
 		foreach ( $pharmacies as $pharmacy ) {
 			$pharmacies_ids[] = $pharmacy->reg__no_;
 		}
-		$cyphar_data = $this->cypharms( $pharmacies_ids );
+		//$cyphar_data = $this->cypharms( $pharmacies_ids );
+
+		$cyphar_data = $pharmacies; //Bypass another change from data.gov...
 
 		return $cyphar_data;
 	}
