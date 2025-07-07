@@ -40,35 +40,35 @@ The plugin supports the following optional parameters:
 You can customize the cache duration by adding the following code to your theme's `functions.php` file:
 
 **Set cache to 24 hours:**
-```php
+```
 add_filter( 'cypharm_cache_duration', function() {
     return 86400; // 24 hours in seconds
 });
 ```
 
 **Set cache to 1 hour:**
-```php
+```
 add_filter( 'cypharm_cache_duration', function() {
     return 3600; // 1 hour in seconds
 });
 ```
 
 **Set cache to 30 minutes:**
-```php
+```
 add_filter( 'cypharm_cache_duration', function() {
     return 1800; // 30 minutes in seconds
 });
 ```
 
 **Disable caching (not recommended for production):**
-```php
+```
 add_filter( 'cypharm_cache_duration', function() {
     return 0; // No caching
 });
 ```
 
 **Using a named function (recommended):**
-```php
+```
 function my_custom_cypharm_cache_duration() {
     return 7200; // 2 hours in seconds
 }
