@@ -5,7 +5,7 @@ Description: An easy way to show the all-night pharmacies of Cyprus per city.
 Author: Savvas
 Author URI: https://savvasha.com
 Text Domain: cyprus-pharmacies
-Version: 1.2.7
+Version: 1.2.8
 Requires at least: 5.3
 Requires PHP: 7.4
 License: GPL v2 or later
@@ -69,6 +69,17 @@ function cypharm_admin_menu() {
 		'cyprus-pharmacies-cache',
 		'cypharm_cache_page'
 	);
+}
+
+/**
+ * Add Settings link to plugin action links
+ */
+add_filter( 'plugin_action_links_' . CYPHARM_PLUGIN_BASE, 'cypharm_plugin_action_links' );
+
+function cypharm_plugin_action_links( $links ) {
+	$settings_link = '<a href="' . admin_url( 'options-general.php?page=cyprus-pharmacies-cache' ) . '">' . __( 'Settings', 'cyprus-pharmacies' ) . '</a>';
+	array_unshift( $links, $settings_link );
+	return $links;
 }
 
 /**
