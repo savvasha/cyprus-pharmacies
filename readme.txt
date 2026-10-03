@@ -3,9 +3,9 @@ Contributors: savvasha
 License: GPLv2 or later
 Tags: Cyprus, pharmacy, pharmacies, greek, night
 Requires at least: 5.3
-Tested up to: 6.8
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.2.8
+Stable tag: 1.2.9
 
 Show all-night today and tomorrow pharmacies of Cyprus
 
@@ -84,6 +84,11 @@ add_filter( 'cypharm_cache_duration', 'my_custom_cypharm_cache_duration' );
 1.  The all-night pharmacies of Paphos for 4th and 5th of January
 
 == Changelog ==
+
+= 1.2.9 =
+
+* Tested up to WordPress 7.1
+* DEV: Codebase brought in line with WordPress Coding Standards; no functional changes
 
 = 1.2.8 =
 

@@ -1,4 +1,10 @@
 <?php
+/**
+ * Pharmacies coordinates.
+ *
+ * @package Cyprus Pharmacies
+ * @subpackage Coordinates
+ */
 
 /**
  * Pharmacies Coordinates
@@ -318,7 +324,6 @@ class CyPharm_Coordinates {
 
 		self::$coordinates = apply_filters( 'cypharm_coordinates', $cypharm_coordinates );
 	}
-
 }
 
 new CyPharm_Coordinates();

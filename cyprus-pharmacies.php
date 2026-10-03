@@ -5,7 +5,7 @@ Description: An easy way to show the all-night pharmacies of Cyprus per city.
 Author: Savvas
 Author URI: https://savvasha.com
 Text Domain: cyprus-pharmacies
-Version: 1.2.8
+Version: 1.2.9
 Requires at least: 5.3
 Requires PHP: 7.4
 License: GPL v2 or later
@@ -30,37 +30,37 @@ if ( ! defined( 'CYPHARM_PLUGIN_BASE' ) ) {
  * Include required files
  */
 // load the needed data files.
-require dirname( __FILE__ ) . '/includes/class-cypharm-data.php';
+require __DIR__ . '/includes/class-cypharm-data.php';
 // load the needed frontend files.
-require dirname( __FILE__ ) . '/includes/class-cypharm-front.php';
+require __DIR__ . '/includes/class-cypharm-front.php';
 // load the needed coordinates.
-require dirname( __FILE__ ) . '/includes/class-cypharm-coordinates.php';
+require __DIR__ . '/includes/class-cypharm-coordinates.php';
 
-/**
- * Plugin activation hook - clear any existing cache
- */
 register_activation_hook( __FILE__, 'cypharm_activate' );
 
+/**
+ * Plugin activation hook - clear any existing cache.
+ */
 function cypharm_activate() {
 	$cypharm_data = new CyPharm_Data();
 	$cypharm_data->clear_cache();
 }
 
-/**
- * Plugin deactivation hook - clear cache
- */
 register_deactivation_hook( __FILE__, 'cypharm_deactivate' );
 
+/**
+ * Plugin deactivation hook - clear cache.
+ */
 function cypharm_deactivate() {
 	$cypharm_data = new CyPharm_Data();
 	$cypharm_data->clear_cache();
 }
 
-/**
- * Add admin menu for cache management
- */
 add_action( 'admin_menu', 'cypharm_admin_menu' );
 
+/**
+ * Add admin menu for cache management.
+ */
 function cypharm_admin_menu() {
 	add_options_page(
 		__( 'Cyprus Pharmacies Cache', 'cyprus-pharmacies' ),
@@ -71,11 +71,14 @@ function cypharm_admin_menu() {
 	);
 }
 
-/**
- * Add Settings link to plugin action links
- */
 add_filter( 'plugin_action_links_' . CYPHARM_PLUGIN_BASE, 'cypharm_plugin_action_links' );
 
+/**
+ * Add Settings link to plugin action links.
+ *
+ * @param array $links The existing plugin action links.
+ * @return array
+ */
 function cypharm_plugin_action_links( $links ) {
 	$settings_link = '<a href="' . admin_url( 'options-general.php?page=cyprus-pharmacies-cache' ) . '">' . __( 'Settings', 'cyprus-pharmacies' ) . '</a>';
 	array_unshift( $links, $settings_link );
@@ -86,12 +89,12 @@ function cypharm_plugin_action_links( $links ) {
  * Admin page for cache management
  */
 function cypharm_cache_page() {
-	if ( isset( $_POST['clear_cache'] ) && wp_verify_nonce( $_POST['cypharm_nonce'], 'cypharm_clear_cache' ) ) {
+	if ( isset( $_POST['clear_cache'], $_POST['cypharm_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['cypharm_nonce'] ) ), 'cypharm_clear_cache' ) ) {
 		$cypharm_data = new CyPharm_Data();
 		$cypharm_data->clear_cache();
 		echo '<div class="notice notice-success"><p>' . esc_html__( 'Cache cleared successfully!', 'cyprus-pharmacies' ) . '</p></div>';
 	}
-	
+
 	?>
 	<div class="wrap">
 		<h1><?php esc_html_e( 'Cyprus Pharmacies Cache Management', 'cyprus-pharmacies' ); ?></h1>
@@ -108,17 +111,17 @@ function cypharm_cache_page() {
 		<pre style="background: #f1f1f1; padding: 15px; border-radius: 3px; overflow-x: auto;">
 // Set cache duration to 24 hours (86400 seconds)
 add_filter( 'cypharm_cache_duration', function() {
-    return 86400; // 24 hours in seconds
+	return 86400; // 24 hours in seconds
 });
 
 // Or set cache duration to 1 hour (3600 seconds)
 add_filter( 'cypharm_cache_duration', function() {
-    return 3600; // 1 hour in seconds
+	return 3600; // 1 hour in seconds
 });
 
 // Or disable caching entirely (not recommended for production)
 add_filter( 'cypharm_cache_duration', function() {
-    return 0; // No caching
+	return 0; // No caching
 });
 </pre>
 		

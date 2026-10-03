@@ -1,4 +1,10 @@
 <?php
+/**
+ * Frontend functionality.
+ *
+ * @package Cyprus Pharmacies
+ * @subpackage Front
+ */
 
 /**
  * Frontend functionality
@@ -34,7 +40,7 @@ class CyPharm_Front {
 			'cypharm'
 		);
 
-		// Validate city parameter against allowed values
+		// Validate city parameter against allowed values.
 		$allowed_cities = array( 'Paphos', 'Limassol', 'Nicosia', 'Larnaca', 'Paralimni' );
 		if ( ! in_array( $atts['city'], $allowed_cities, true ) ) {
 			$atts['city'] = 'Paphos';
@@ -125,7 +131,6 @@ class CyPharm_Front {
 
 		return $output;
 	}
-
 }
 
 new CyPharm_Front();

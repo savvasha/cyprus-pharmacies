@@ -1,4 +1,10 @@
 <?php
+/**
+ * Data functionality.
+ *
+ * @package Cyprus Pharmacies
+ * @subpackage Data
+ */
 
 /**
  * Data functionality
@@ -9,16 +15,32 @@
  */
 class CyPharm_Data {
 
-	/** @var string The url of data. */
+	/**
+	 * The url of data.
+	 *
+	 * @var string
+	 */
 	public $url;
 
-	/** @var string The city for which we want the data. */
+	/**
+	 * The city for which we want the data.
+	 *
+	 * @var string
+	 */
 	public $city;
 
-	/** @var string The date for which we want the data. */
+	/**
+	 * The date for which we want the data.
+	 *
+	 * @var string
+	 */
 	public $date;
 
-	/** @var int Cache duration in seconds (12 hours). */
+	/**
+	 * Cache duration in seconds (12 hours).
+	 *
+	 * @var int
+	 */
 	private $cache_duration = 43200;
 
 	/**
@@ -27,7 +49,7 @@ class CyPharm_Data {
 	 * @access public
 	 */
 	public function __construct() {
-		// Allow developers to modify cache duration
+		// Allow developers to modify cache duration.
 		$this->cache_duration = apply_filters( 'cypharm_cache_duration', $this->cache_duration );
 	}
 
@@ -58,62 +80,64 @@ class CyPharm_Data {
 			$main_url = 'https://www.data.gov.cy/api/action/datastore/search.json?resource_id=' . $city_id;
 		} else {
 			return $cyphar_data;
-		}	
+		}
 
 		$date = $this->date;
 
-		// Create cache key based on city and date
+		// Create cache key based on city and date.
 		$cache_key = 'cypharm_data_' . sanitize_key( $this->city ) . '_' . sanitize_key( $date );
-		
-		// Try to get cached data first
+
+		// Try to get cached data first.
 		$cached_data = get_transient( $cache_key );
-		
+
 		if ( false !== $cached_data ) {
 			return $cached_data;
 		}
 
 		$url      = $main_url . '&filters[date]=' . $date;
-		$response = wp_remote_get( $url, array( 
-			'timeout' => 15,
-			'sslverify' => true,
-			'user-agent' => 'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' )
-		) );
+		$response = wp_remote_get(
+			$url,
+			array(
+				'timeout'    => 15,
+				'sslverify'  => true,
+				'user-agent' => 'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ),
+			)
+		);
 
 		if ( ! is_wp_error( $response ) ) {
 			$response_code = wp_remote_retrieve_response_code( $response );
-			
-			// Check if the response is successful
+
+			// Check if the response is successful.
 			if ( 200 === $response_code ) {
 				$contents = wp_remote_retrieve_body( $response );
 				$results  = json_decode( $contents );
-				
-				// Validate JSON decode success and object structure
+
+				// Validate JSON decode success and object structure.
 				if ( json_last_error() === JSON_ERROR_NONE && isset( $results->result->records ) ) {
 					$pharmacies = $results->result->records;
 				} else {
-					// Log error for debugging
-					error_log( 'Cyprus Pharmacies: Invalid JSON response or missing records structure' );
+					// Log error for debugging.
+					error_log( 'Cyprus Pharmacies: Invalid JSON response or missing records structure' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 					return $cyphar_data;
 				}
 			} else {
-				// Log error for debugging
-				error_log( 'Cyprus Pharmacies: API request failed with response code: ' . $response_code );
+				// Log error for debugging.
+				error_log( 'Cyprus Pharmacies: API request failed with response code: ' . $response_code ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				return $cyphar_data;
 			}
 		} else {
-			// Log error for debugging
-			error_log( 'Cyprus Pharmacies: API request failed: ' . $response->get_error_message() );
+			// Log error for debugging.
+			error_log( 'Cyprus Pharmacies: API request failed: ' . $response->get_error_message() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			return $cyphar_data;
 		}
-		
+
 		foreach ( $pharmacies as $pharmacy ) {
 			$pharmacies_ids[] = $pharmacy->reg__no_;
 		}
-		//$cyphar_data = $this->cypharms( $pharmacies_ids );
 
-		$cyphar_data = $pharmacies; //Bypass another change from data.gov...
+		$cyphar_data = $pharmacies; // Bypass another change from data.gov.
 
-		// Cache the data for future requests
+		// Cache the data for future requests.
 		set_transient( $cache_key, $cyphar_data, $this->cache_duration );
 
 		return $cyphar_data;
@@ -134,61 +158,63 @@ class CyPharm_Data {
 			$ids = array();
 		}
 
-		// Create cache key for secondary API call
+		// Create cache key for secondary API call.
 		$cache_key = 'cypharm_pharmacies_' . md5( $ids );
-		
-		// Try to get cached data first
+
+		// Try to get cached data first.
 		$cached_data = get_transient( $cache_key );
-		
+
 		if ( false !== $cached_data ) {
 			return apply_filters( 'cypharm_pharmacies', $cached_data, $pharms_ids );
 		}
 
-		$pharmacies = array();
+		$pharmacies      = array();
 		$temp_pharmacies = array();
 		$url             = 'https://www.data.gov.cy/api/action/datastore/search.json?resource_id=82326f44-28f8-4de8-9367-2f6148db02f7&limit=1000&filters[reg_no_]=' . $ids;
-		$response        = wp_remote_get( $url, array( 
-			'timeout' => 15,
-			'sslverify' => true,
-			'user-agent' => 'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' )
-		) );
-		
+		$response        = wp_remote_get(
+			$url,
+			array(
+				'timeout'    => 15,
+				'sslverify'  => true,
+				'user-agent' => 'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ),
+			)
+		);
+
 		if ( is_wp_error( $response ) ) {
-			// Log error for debugging
-			error_log( 'Cyprus Pharmacies: Secondary API request failed: ' . $response->get_error_message() );
+			// Log error for debugging.
+			error_log( 'Cyprus Pharmacies: Secondary API request failed: ' . $response->get_error_message() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			return array();
 		}
-		
+
 		$response_code = wp_remote_retrieve_response_code( $response );
-		
-		// Check if the response is successful
+
+		// Check if the response is successful.
 		if ( 200 !== $response_code ) {
-			// Log error for debugging
-			error_log( 'Cyprus Pharmacies: Secondary API request failed with response code: ' . $response_code );
+			// Log error for debugging.
+			error_log( 'Cyprus Pharmacies: Secondary API request failed with response code: ' . $response_code ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			return array();
 		}
-		
+
 		$contents = wp_remote_retrieve_body( $response );
 		$results  = json_decode( $contents );
-		
-		// Validate JSON decode success and object structure
+
+		// Validate JSON decode success and object structure.
 		if ( json_last_error() !== JSON_ERROR_NONE || ! isset( $results->result->records ) ) {
-			// Log error for debugging
-			error_log( 'Cyprus Pharmacies: Invalid JSON response or missing records structure in secondary API' );
+			// Log error for debugging.
+			error_log( 'Cyprus Pharmacies: Invalid JSON response or missing records structure in secondary API' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			return array();
 		}
-		
+
 		$temp_pharmacies = $results->result->records;
-		
+
 		foreach ( $temp_pharmacies as $temp_pharmacy ) {
 			$pharmacies[ $temp_pharmacy->reg_no_ ] = $temp_pharmacy;
 		}
 
-		// Cache the data for future requests
+		// Cache the data for future requests.
 		set_transient( $cache_key, $pharmacies, $this->cache_duration );
 
 		return apply_filters( 'cypharm_pharmacies', $pharmacies, $pharms_ids );
-
 	}
 
 	/**
@@ -199,21 +225,21 @@ class CyPharm_Data {
 	 */
 	public function clear_cache() {
 		global $wpdb;
-		
-		// Delete all transients that start with 'cypharm_'
-		$wpdb->query( 
-			$wpdb->prepare( 
-				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s", 
-				'_transient_cypharm_%' 
-			) 
+
+		// Delete all transients that start with 'cypharm_'. Direct query is
+		// required to bulk-remove transients by name; there is nothing to cache.
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
+				'_transient_cypharm_%'
+			)
 		);
-		
-		$wpdb->query( 
-			$wpdb->prepare( 
-				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s", 
-				'_transient_timeout_cypharm_%' 
-			) 
+
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
+				'_transient_timeout_cypharm_%'
+			)
 		);
 	}
-
 }
