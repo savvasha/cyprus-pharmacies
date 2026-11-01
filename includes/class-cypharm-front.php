@@ -89,12 +89,9 @@ class CyPharm_Front {
 			$reg_no  = self::field( $pharmacy, 'reg__no_' );
 			$address = esc_html( self::field( $pharmacy, 'address' ) );
 
-			if ( '' !== $reg_no && isset( $coordinates[ $city ][ $reg_no ]['Latitude'], $coordinates[ $city ][ $reg_no ]['Longitude'] ) && ! isset( $pharmacy->geolocation ) ) {
-				$lat  = $coordinates[ $city ][ $reg_no ]['Latitude'];
-				$long = $coordinates[ $city ][ $reg_no ]['Longitude'];
-				if ( is_numeric( $lat ) && is_numeric( $long ) ) {
-					$address = '<a href="' . esc_url( 'https://www.google.com/maps/place/' . $lat . ',' . $long ) . '" target="_blank" rel="noopener noreferrer">' . $address . '</a>';
-				}
+			$point = self::map_point( $pharmacy, $city, $reg_no, $coordinates );
+			if ( null !== $point ) {
+				$address = '<a href="' . esc_url( 'https://www.google.com/maps/place/' . $point ) . '" target="_blank" rel="noopener noreferrer">' . $address . '</a>';
 			}
 
 			$output .= '<h4>' . esc_html( trim( self::field( $pharmacy, 'surmame' ) . ' ' . self::field( $pharmacy, 'name' ) ) ) . '</h4>';
@@ -125,6 +122,60 @@ class CyPharm_Front {
 		}
 
 		return $output;
+	}
+
+	/**
+	 * The map point of a pharmacy as "lat,long", or null if unknown.
+	 *
+	 * Coordinates in the record itself (`latitude`/`longitude`, provided by
+	 * the custom API) take precedence; otherwise the bundled coordinates
+	 * (filterable via `cypharm_coordinates`) are used. Records with a
+	 * `geolocation` field get no map link.
+	 *
+	 * @param mixed  $pharmacy    Pharmacy record.
+	 * @param string $city        City name.
+	 * @param string $reg_no      Registration number.
+	 * @param array  $coordinates Bundled coordinates, see CyPharm_Coordinates::get().
+	 * @return string|null
+	 */
+	private static function map_point( $pharmacy, $city, $reg_no, $coordinates ) {
+		if ( ! is_object( $pharmacy ) || isset( $pharmacy->geolocation ) ) {
+			return null;
+		}
+
+		$candidates = array(
+			array( $pharmacy->latitude ?? null, $pharmacy->longitude ?? null ),
+		);
+		if ( '' !== $reg_no && isset( $coordinates[ $city ][ $reg_no ] ) && is_array( $coordinates[ $city ][ $reg_no ] ) ) {
+			$candidates[] = array( $coordinates[ $city ][ $reg_no ]['Latitude'] ?? null, $coordinates[ $city ][ $reg_no ]['Longitude'] ?? null );
+		}
+
+		foreach ( $candidates as $candidate ) {
+			list( $lat, $long ) = $candidate;
+			if ( ! is_numeric( $lat ) || ! is_numeric( $long ) ) {
+				continue;
+			}
+
+			$lat  = (float) $lat;
+			$long = (float) $long;
+			if ( abs( $lat ) > 90 || abs( $long ) > 180 || ( 0.0 === $lat && 0.0 === $long ) ) {
+				continue;
+			}
+
+			return self::format_coordinate( $lat ) . ',' . self::format_coordinate( $long );
+		}
+
+		return null;
+	}
+
+	/**
+	 * Formats a coordinate with up to 7 decimals (about 1cm), locale-independent.
+	 *
+	 * @param float $value Coordinate.
+	 * @return string
+	 */
+	private static function format_coordinate( $value ) {
+		return rtrim( rtrim( sprintf( '%.7F', $value ), '0' ), '.' );
 	}
 
 	/**

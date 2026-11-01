@@ -127,6 +127,7 @@ An alternative API that serves the same schedule. It is used only if an administ
 * New: Optional custom API data source with Client ID/Secret, under Settings → Cyprus Pharmacies (Source dropdown; the API fields appear only when "Custom API" is selected). data.gov.cy remains the default and is used as a fallback on any API failure.
 * New: "Test connection" button for the saved data source (data.gov.cy or the custom API).
 * New: `uninstall.php` removes the plugin's options and cached data.
+* New: When the data source provides `latitude`/`longitude` for a pharmacy (e.g. a custom API), the address links to that point on Google Maps, in every city. The bundled Paphos coordinates (and the `cypharm_coordinates` filter) are used when a record has no coordinates.
 
 = 1.2.9 =
 
