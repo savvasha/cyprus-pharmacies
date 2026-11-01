@@ -103,6 +103,20 @@ class CyPharm_Data {
 			return array();
 		}
 
+		// Optional custom API; on any failure fall back to data.gov.cy for this request.
+		$api = CyPharm_Settings::api_config();
+		if ( null !== $api ) {
+			$records = $this->cached(
+				'api',
+				function () use ( $api ) {
+					return $this->fetch_api( $api );
+				}
+			);
+			if ( null !== $records ) {
+				return $records;
+			}
+		}
+
 		$records = $this->cached( 'datagov', array( $this, 'fetch_datagov' ) );
 
 		return null === $records ? array() : $records;
@@ -196,6 +210,77 @@ class CyPharm_Data {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Fetches the records for the current city/date from the custom API.
+	 *
+	 * @param array $api Credentials from CyPharm_Settings::api_config().
+	 * @return array|null Records, or null on failure.
+	 */
+	private function fetch_api( $api ) {
+		$result = self::request_api( $api, $this->city, $this->date );
+
+		if ( is_string( $result ) ) {
+			// Only the error code is logged, never the credentials or headers.
+			self::log( 'Custom API request failed (' . $result . '); falling back to data.gov.cy.' );
+			return null;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Requests the on-duty pharmacies from the custom API.
+	 *
+	 * Without valid credentials Cloudflare Access answers first (403, or a
+	 * 302 to an HTML login page), so redirects are not followed and only a
+	 * 200 with valid JSON and a `result.records` array is accepted.
+	 *
+	 * @param array  $api  Array with url, client_id and client_secret.
+	 * @param string $city City (one of the CITIES keys).
+	 * @param string $date Date as Y-m-d.
+	 * @return array|string Records on success, or a short error code.
+	 */
+	private static function request_api( $api, $city, $date ) {
+		$url = $api['url'] . '/api/v1/datagov?' . http_build_query(
+			array(
+				'city' => $city,
+				'date' => $date,
+			),
+			'',
+			'&',
+			PHP_QUERY_RFC3986
+		);
+
+		$response = wp_remote_get(
+			$url,
+			array(
+				'timeout'     => 10,
+				'redirection' => 0,
+				'sslverify'   => true,
+				'user-agent'  => self::user_agent(),
+				'headers'     => array(
+					'Accept'                  => 'application/json',
+					'CF-Access-Client-Id'     => $api['client_id'],
+					'CF-Access-Client-Secret' => $api['client_secret'],
+				),
+			)
+		);
+
+		return self::parse_records_response( $response );
+	}
+
+	/**
+	 * Tests the custom API with today's pharmacies of Nicosia.
+	 *
+	 * @param array $api Array with url, client_id and client_secret.
+	 * @return string 'ok' or a short error code (never the response body).
+	 */
+	public static function test_api( $api ) {
+		$result = self::request_api( $api, 'Nicosia', wp_date( 'Y-m-d', null, new DateTimeZone( self::TIMEZONE ) ) );
+
+		return is_array( $result ) ? 'ok' : $result;
 	}
 
 	/**

@@ -23,6 +23,10 @@ The plugin supports the following optional parameters:
 * `city`: select the Cyprus city between Nicosia, Limassol, Larnaca, Paralimni and Paphos (defaults to `Paphos`)
 * `title`: Choose a custom title to use (defaults to `false`)
 
+**Data source**
+
+By default the pharmacies are loaded from the National Opendata Portal of Cyprus (data.gov.cy). Under **Settings → Cyprus Pharmacies** an administrator can switch to a custom API, entering its URL, a Client ID and a Client Secret. If that API fails for any reason, data.gov.cy is used for that request. The "Test connection" button checks the saved credentials.
+
 **Performance Features**
 
 * **Caching**: API responses are cached for 12 hours to improve performance and reduce API calls
@@ -81,7 +85,7 @@ add_filter( 'cypharm_cache_duration', 'my_custom_cypharm_cache_duration' );
 
 == External services ==
 
-This plugin connects to the following external service to get the list of on-duty (all-night) pharmacies. It does not work without it.
+This plugin connects to external services to get the list of on-duty (all-night) pharmacies. It does not work without them. data.gov.cy is always used by default; a custom API is used only if an administrator configures it.
 
 **National Opendata Portal of Cyprus (data.gov.cy)**
 
@@ -89,7 +93,15 @@ The plugin requests the on-duty pharmacies schedule from the public API of the N
 
 * **When:** whenever a page containing the `[cypharm]` shortcode is rendered and the requested city and day (today or tomorrow) are not in the plugin's cache. Requests are made by your server, not by your visitors' browsers.
 * **What is sent:** the city's dataset ID and the requested date. As with any HTTP request made by WordPress, the request includes a User-Agent header with your WordPress version and your site's URL, and your server's IP address is visible to the service.
-* Provider: Department of Information Technology Services, Republic of Cyprus. [Disclaimer / terms of use](https://www.data.gov.cy/el/node/96), [Privacy policy](https://www.data.gov.cy/en/privacy-policy).
+* Provider: Republic of Cyprus, National Opendata Portal. [Disclaimer / terms of use](https://www.data.gov.cy/el/node/96), [Privacy policy](https://www.data.gov.cy/en/privacy-policy).
+* It is also used as a fallback whenever the optional custom API (below) fails.
+
+**Custom API (optional, off by default)**
+
+An alternative API that serves the same schedule. It is used only if an administrator selects "Custom API" under Settings → Cyprus Pharmacies and saves its URL, a Client ID and a Client Secret. The plugin does not include any default API URL or credentials; the service, its URL and the credentials are provided by its operator, and that operator's terms of service and privacy policy apply.
+
+* **When:** whenever a page containing the `[cypharm]` shortcode is rendered and the requested city and day are not in the plugin's cache, and when an administrator clicks "Test connection". Requests are made by your server, not by your visitors' browsers.
+* **What is sent:** the city name and the requested date; the Client ID and Client Secret, as HTTP headers used for authentication; a User-Agent header with your WordPress version and your site's URL. Your server's IP address is visible to the service. No information about your visitors is sent.
 
 == Screenshots ==
 
@@ -112,6 +124,9 @@ The plugin requests the on-duty pharmacies schedule from the public API of the N
 * DEV: `CyPharm_Data::$date` is now a `Y-m-d` date.
 * Readme: Added an "External services" section.
 * Requirement: PHP 8.2 or newer (was 7.4).
+* New: Optional custom API data source with Client ID/Secret, under Settings → Cyprus Pharmacies. data.gov.cy remains the default and is used as a fallback on any API failure.
+* New: "Test connection" button for the custom API.
+* New: `uninstall.php` removes the plugin's options and cached data.
 
 = 1.2.9 =
 
