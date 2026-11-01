@@ -25,7 +25,7 @@ The plugin supports the following optional parameters:
 
 **Data source**
 
-By default the pharmacies are loaded from the National Opendata Portal of Cyprus (data.gov.cy). Under **Settings → Cyprus Pharmacies** an administrator can switch to a custom API, entering its URL, a Client ID and a Client Secret. If that API fails for any reason, data.gov.cy is used for that request. The "Test connection" button checks the saved credentials.
+By default the pharmacies are loaded from the National Opendata Portal of Cyprus (data.gov.cy). Under **Settings → Cyprus Pharmacies** an administrator can switch to a custom API, entering its URL, a Client ID and a Client Secret. If that API fails for any reason, data.gov.cy is used for that request. The "Test connection" button checks the saved data source.
 
 **Performance Features**
 
@@ -124,8 +124,8 @@ An alternative API that serves the same schedule. It is used only if an administ
 * DEV: `CyPharm_Data::$date` is now a `Y-m-d` date.
 * Readme: Added an "External services" section.
 * Requirement: PHP 8.2 or newer (was 7.4).
-* New: Optional custom API data source with Client ID/Secret, under Settings → Cyprus Pharmacies. data.gov.cy remains the default and is used as a fallback on any API failure.
-* New: "Test connection" button for the custom API.
+* New: Optional custom API data source with Client ID/Secret, under Settings → Cyprus Pharmacies (Source dropdown; the API fields appear only when "Custom API" is selected). data.gov.cy remains the default and is used as a fallback on any API failure.
+* New: "Test connection" button for the saved data source (data.gov.cy or the custom API).
 * New: `uninstall.php` removes the plugin's options and cached data.
 
 = 1.2.9 =

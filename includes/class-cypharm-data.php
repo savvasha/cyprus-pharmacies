@@ -169,7 +169,28 @@ class CyPharm_Data {
 	 * @return array|null Records, or null on failure.
 	 */
 	private function fetch_datagov() {
-		$day = self::parse_date( $this->date );
+		$result = self::request_datagov( $this->city, $this->date );
+
+		if ( is_string( $result ) ) {
+			self::log( 'data.gov.cy request failed (' . $result . ').' );
+			return null;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Requests the on-duty pharmacies from data.gov.cy.
+	 *
+	 * @param string $city City (one of the CITIES keys).
+	 * @param string $date Date as Y-m-d.
+	 * @return array|string Records on success, or a short error code.
+	 */
+	private static function request_datagov( $city, $date ) {
+		$day = self::parse_date( $date );
+		if ( ! $day || ! is_string( $city ) || ! array_key_exists( $city, self::CITIES ) ) {
+			return 'invalid_request';
+		}
 
 		// data.gov.cy stores dates in several formats; ask for all of them.
 		$dates = implode(
@@ -184,7 +205,7 @@ class CyPharm_Data {
 
 		$url = 'https://www.data.gov.cy/api/action/datastore/search.json?' . http_build_query(
 			array(
-				'resource_id' => self::CITIES[ $this->city ],
+				'resource_id' => self::CITIES[ $city ],
 				'limit'       => 50,
 				'filters'     => array( 'date' => $dates ),
 			),
@@ -202,14 +223,18 @@ class CyPharm_Data {
 			)
 		);
 
-		$result = self::parse_records_response( $response );
+		return self::parse_records_response( $response );
+	}
 
-		if ( is_string( $result ) ) {
-			self::log( 'data.gov.cy request failed (' . $result . ').' );
-			return null;
-		}
+	/**
+	 * Tests data.gov.cy with today's pharmacies of Nicosia.
+	 *
+	 * @return string 'ok' or a short error code (never the response body).
+	 */
+	public static function test_datagov() {
+		$result = self::request_datagov( 'Nicosia', wp_date( 'Y-m-d', null, new DateTimeZone( self::TIMEZONE ) ) );
 
-		return $result;
+		return is_array( $result ) ? 'ok' : $result;
 	}
 
 	/**

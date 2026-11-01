@@ -226,7 +226,23 @@ class CyPharm_Settings {
 
 		if ( $hook ) {
 			add_action( 'load-' . $hook, array( __CLASS__, 'ensure_options' ) );
+			add_action( 'admin_print_styles-' . $hook, array( __CLASS__, 'print_styles' ) );
 		}
+	}
+
+	/**
+	 * Hides the custom API fields unless "Custom API" is selected in the
+	 * Source dropdown. Pure CSS (:has), so it follows the dropdown live
+	 * without JavaScript; browsers without :has support show the fields.
+	 *
+	 * @return void
+	 */
+	public static function print_styles() {
+		printf(
+			'<style id="cypharm-settings-css">.form-table:has(#%1$s option[value="%2$s"]:checked) tr.cypharm-api-field{display:none;}</style>',
+			esc_attr( self::OPT_SOURCE ),
+			esc_attr( self::SOURCE_DATAGOV )
+		);
 	}
 
 	/**
@@ -299,10 +315,27 @@ class CyPharm_Settings {
 			self::PAGE
 		);
 
-		add_settings_field( self::OPT_SOURCE, __( 'Source', 'cyprus-pharmacies' ), array( __CLASS__, 'render_source_field' ), self::PAGE, 'cypharm_source_section' );
-		add_settings_field( self::OPT_API_URL, __( 'API URL', 'cyprus-pharmacies' ), array( __CLASS__, 'render_api_url_field' ), self::PAGE, 'cypharm_source_section', array( 'label_for' => self::OPT_API_URL ) );
-		add_settings_field( self::OPT_CLIENT_ID, __( 'Client ID', 'cyprus-pharmacies' ), array( __CLASS__, 'render_client_id_field' ), self::PAGE, 'cypharm_source_section', array( 'label_for' => self::OPT_CLIENT_ID ) );
-		add_settings_field( self::OPT_CLIENT_SECRET, __( 'Client Secret', 'cyprus-pharmacies' ), array( __CLASS__, 'render_client_secret_field' ), self::PAGE, 'cypharm_source_section', array( 'label_for' => self::OPT_CLIENT_SECRET ) );
+		add_settings_field( self::OPT_SOURCE, __( 'Source', 'cyprus-pharmacies' ), array( __CLASS__, 'render_source_field' ), self::PAGE, 'cypharm_source_section', array( 'label_for' => self::OPT_SOURCE ) );
+
+		// Rows shown only when "Custom API" is selected (see print_styles()).
+		$api_fields = array(
+			self::OPT_API_URL       => array( __( 'API URL', 'cyprus-pharmacies' ), 'render_api_url_field' ),
+			self::OPT_CLIENT_ID     => array( __( 'Client ID', 'cyprus-pharmacies' ), 'render_client_id_field' ),
+			self::OPT_CLIENT_SECRET => array( __( 'Client Secret', 'cyprus-pharmacies' ), 'render_client_secret_field' ),
+		);
+		foreach ( $api_fields as $option => $field ) {
+			add_settings_field(
+				$option,
+				$field[0],
+				array( __CLASS__, $field[1] ),
+				self::PAGE,
+				'cypharm_source_section',
+				array(
+					'label_for' => $option,
+					'class'     => 'cypharm-api-field',
+				)
+			);
+		}
 	}
 
 	/**
@@ -396,17 +429,16 @@ class CyPharm_Settings {
 			self::SOURCE_API     => __( 'Custom API', 'cyprus-pharmacies' ),
 		);
 
-		echo '<fieldset><legend class="screen-reader-text">' . esc_html__( 'Source', 'cyprus-pharmacies' ) . '</legend>';
+		printf( '<select id="%1$s" name="%1$s">', esc_attr( self::OPT_SOURCE ) );
 		foreach ( $sources as $value => $label ) {
 			printf(
-				'<label><input type="radio" name="%1$s" value="%2$s"%3$s> %4$s</label><br>',
-				esc_attr( self::OPT_SOURCE ),
+				'<option value="%1$s"%2$s>%3$s</option>',
 				esc_attr( $value ),
-				checked( self::source(), $value, false ),
+				selected( self::source(), $value, false ),
 				esc_html( $label )
 			);
 		}
-		echo '</fieldset>';
+		echo '</select>';
 	}
 
 	/**
@@ -487,10 +519,23 @@ class CyPharm_Settings {
 
 		check_admin_referer( self::TEST_ACTION );
 
-		$credentials = self::saved_api_credentials();
-		$result      = null === $credentials ? 'incomplete' : CyPharm_Data::test_api( $credentials );
+		// Test the saved source; the custom API uses the saved credentials.
+		$source = self::source();
+		if ( self::SOURCE_API === $source ) {
+			$credentials = self::saved_api_credentials();
+			$result      = null === $credentials ? 'incomplete' : CyPharm_Data::test_api( $credentials );
+		} else {
+			$result = CyPharm_Data::test_datagov();
+		}
 
-		wp_safe_redirect( self::page_url( array( 'cypharm_test' => $result ) ) );
+		wp_safe_redirect(
+			self::page_url(
+				array(
+					'cypharm_test'        => $result,
+					'cypharm_test_source' => $source,
+				)
+			)
+		);
 		exit;
 	}
 
@@ -503,12 +548,20 @@ class CyPharm_Settings {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display only.
 		$code = isset( $_GET['cypharm_test'] ) ? sanitize_key( wp_unslash( $_GET['cypharm_test'] ) ) : '';
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display only.
+		$source = isset( $_GET['cypharm_test_source'] ) && self::SOURCE_API === $_GET['cypharm_test_source'] ? self::SOURCE_API : self::SOURCE_DATAGOV;
+		$label  = self::SOURCE_API === $source ? __( 'Custom API', 'cyprus-pharmacies' ) : 'data.gov.cy';
+
 		if ( '' === $code ) {
 			return;
 		}
 
 		if ( 'ok' === $code ) {
-			echo '<div class="notice notice-success"><p>' . esc_html__( 'Connection test: OK.', 'cyprus-pharmacies' ) . '</p></div>';
+			printf(
+				'<div class="notice notice-success"><p>%s</p></div>',
+				/* translators: %s: data source name, e.g. data.gov.cy or Custom API. */
+				esc_html( sprintf( __( 'Connection test (%s): OK.', 'cyprus-pharmacies' ), $label ) )
+			);
 			return;
 		}
 
@@ -517,18 +570,20 @@ class CyPharm_Settings {
 		}
 
 		$hints = array(
-			'incomplete' => __( 'Save the API URL, Client ID and Client Secret first.', 'cyprus-pharmacies' ),
-			'http_302'   => __( 'Check the Client ID and Client Secret.', 'cyprus-pharmacies' ),
-			'http_401'   => __( 'Check the Client ID and Client Secret.', 'cyprus-pharmacies' ),
-			'http_403'   => __( 'Check the Client ID and Client Secret.', 'cyprus-pharmacies' ),
-			'http_429'   => __( 'Too many requests; try again in a moment.', 'cyprus-pharmacies' ),
-			'timeout'    => __( 'The API did not respond in time.', 'cyprus-pharmacies' ),
+			'http_429' => __( 'Too many requests; try again in a moment.', 'cyprus-pharmacies' ),
+			'timeout'  => __( 'The service did not respond in time.', 'cyprus-pharmacies' ),
 		);
+		if ( self::SOURCE_API === $source ) {
+			$hints['incomplete'] = __( 'Save the API URL, Client ID and Client Secret first.', 'cyprus-pharmacies' );
+			$hints['http_302']   = __( 'Check the Client ID and Client Secret.', 'cyprus-pharmacies' );
+			$hints['http_401']   = $hints['http_302'];
+			$hints['http_403']   = $hints['http_302'];
+		}
 
 		printf(
 			'<div class="notice notice-error"><p>%1$s %2$s</p></div>',
-			/* translators: %s: error code, e.g. http_403 or timeout. */
-			esc_html( sprintf( __( 'Connection test failed (%s).', 'cyprus-pharmacies' ), $code ) ),
+			/* translators: 1: data source name, e.g. data.gov.cy or Custom API. 2: error code, e.g. http_403 or timeout. */
+			esc_html( sprintf( __( 'Connection test (%1$s) failed (%2$s).', 'cyprus-pharmacies' ), $label, $code ) ),
 			esc_html( isset( $hints[ $code ] ) ? $hints[ $code ] : '' )
 		);
 	}
@@ -564,7 +619,7 @@ class CyPharm_Settings {
 			</form>
 
 			<h2><?php esc_html_e( 'Test connection', 'cyprus-pharmacies' ); ?></h2>
-			<p><?php esc_html_e( 'Requests today\'s pharmacies of Nicosia from the custom API, using the saved credentials. Save your changes first.', 'cyprus-pharmacies' ); ?></p>
+			<p><?php esc_html_e( 'Requests today\'s pharmacies of Nicosia from the saved data source (data.gov.cy, or the custom API with the saved credentials). Save your changes first.', 'cyprus-pharmacies' ); ?></p>
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<input type="hidden" name="action" value="<?php echo esc_attr( self::TEST_ACTION ); ?>">
 				<?php wp_nonce_field( self::TEST_ACTION ); ?>
