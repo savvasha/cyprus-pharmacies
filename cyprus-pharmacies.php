@@ -5,7 +5,7 @@ Description: An easy way to show the all-night pharmacies of Cyprus per city.
 Author: Savvas
 Author URI: https://savvasha.com
 Text Domain: cyprus-pharmacies
-Version: 1.2.9
+Version: 1.3.0
 Requires at least: 5.3
 Requires PHP: 7.4
 License: GPL v2 or later
@@ -80,7 +80,7 @@ add_filter( 'plugin_action_links_' . CYPHARM_PLUGIN_BASE, 'cypharm_plugin_action
  * @return array
  */
 function cypharm_plugin_action_links( $links ) {
-	$settings_link = '<a href="' . admin_url( 'options-general.php?page=cyprus-pharmacies-cache' ) . '">' . __( 'Settings', 'cyprus-pharmacies' ) . '</a>';
+	$settings_link = '<a href="' . esc_url( admin_url( 'options-general.php?page=cyprus-pharmacies-cache' ) ) . '">' . esc_html__( 'Settings', 'cyprus-pharmacies' ) . '</a>';
 	array_unshift( $links, $settings_link );
 	return $links;
 }
@@ -89,6 +89,10 @@ function cypharm_plugin_action_links( $links ) {
  * Admin page for cache management
  */
 function cypharm_cache_page() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
 	if ( isset( $_POST['clear_cache'], $_POST['cypharm_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['cypharm_nonce'] ) ), 'cypharm_clear_cache' ) ) {
 		$cypharm_data = new CyPharm_Data();
 		$cypharm_data->clear_cache();
@@ -125,7 +129,10 @@ add_filter( 'cypharm_cache_duration', function() {
 });
 </pre>
 		
-		<p><strong><?php esc_html_e( 'Current cache duration:', 'cyprus-pharmacies' ); ?></strong> <?php echo esc_html( apply_filters( 'cypharm_cache_duration', 43200 ) / 3600 ); ?> <?php esc_html_e( 'hours', 'cyprus-pharmacies' ); ?></p>
+		<?php $cypharm_cache_duration = CyPharm_Data::get_cache_duration(); ?>
+		<p><strong><?php esc_html_e( 'Current cache duration:', 'cyprus-pharmacies' ); ?></strong>
+			<?php echo esc_html( $cypharm_cache_duration > 0 ? human_time_diff( 0, $cypharm_cache_duration ) : __( 'Caching is disabled', 'cyprus-pharmacies' ) ); ?>
+		</p>
 	</div>
 	<?php
 }

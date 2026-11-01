@@ -5,7 +5,7 @@ Tags: Cyprus, pharmacy, pharmacies, greek, night
 Requires at least: 5.3
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.2.9
+Stable tag: 1.3.0
 
 Show all-night today and tomorrow pharmacies of Cyprus
 
@@ -79,11 +79,38 @@ add_filter( 'cypharm_cache_duration', 'my_custom_cypharm_cache_duration' );
 
 * [National Opendata Portal](https://www.data.gov.cy/)
 
+== External services ==
+
+This plugin connects to the following external service to get the list of on-duty (all-night) pharmacies. It does not work without it.
+
+**National Opendata Portal of Cyprus (data.gov.cy)**
+
+The plugin requests the on-duty pharmacies schedule from the public API of the National Opendata Portal of the Republic of Cyprus.
+
+* **When:** whenever a page containing the `[cypharm]` shortcode is rendered and the requested city and day (today or tomorrow) are not in the plugin's cache. Requests are made by your server, not by your visitors' browsers.
+* **What is sent:** the city's dataset ID and the requested date. As with any HTTP request made by WordPress, the request includes a User-Agent header with your WordPress version and your site's URL, and your server's IP address is visible to the service.
+* Provider: Department of Information Technology Services, Republic of Cyprus. [Disclaimer / terms of use](https://www.data.gov.cy/el/node/96), [Privacy policy](https://www.data.gov.cy/en/privacy-policy).
+
 == Screenshots ==
 
 1.  The all-night pharmacies of Paphos for 4th and 5th of January
 
 == Changelog ==
+
+= 1.3.0 =
+
+* Fix: Today/tomorrow are now calculated in Cyprus time (Asia/Nicosia); between midnight and 02:00/03:00 the previous day used to be shown, and the day headings could disagree with the listed pharmacies.
+* Fix: Empty results (e.g. a schedule that is not published yet) are no longer cached for 12 hours.
+* Fix: Returning 0 from the `cypharm_cache_duration` filter now really disables caching (it used to cache forever).
+* Fix: The day headings were never closed (`<h3>` instead of `</h3>`).
+* Fix: No PHP warnings when a record lacks a field; map links behave the same for today and tomorrow.
+* Fix: "Clear Cache" now also works with a persistent object cache (Redis, Memcached).
+* Fix: The `cypharm_coordinates` filter can now be used from a theme's functions.php.
+* Tweak: data.gov.cy requests time out after 8 seconds (was 15), ask for up to 50 records, and are logged only when `WP_DEBUG_LOG` is enabled.
+* Tweak: Map links use HTTPS; translatable day heading format; escaping hardening; direct file access guards.
+* DEV: Removed unused code (`CyPharm_Data::cypharms()`, the `cypharm_pharmacies` filter, unused properties).
+* DEV: `CyPharm_Data::$date` is now a `Y-m-d` date.
+* Readme: Added an "External services" section.
 
 = 1.2.9 =
 

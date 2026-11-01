@@ -6,6 +6,8 @@
  * @subpackage Coordinates
  */
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Pharmacies Coordinates
  *
@@ -16,16 +18,36 @@
 class CyPharm_Coordinates {
 
 	/**
-	 * The pharmacies coordinates.
+	 * The pharmacies coordinates, filled on first use by get().
 	 *
-	 * @var array
+	 * @var array|null
 	 */
 	public static $coordinates;
 
 	/**
-	 * Constructor
+	 * Returns the pharmacies coordinates, keyed by city and registration number.
+	 *
+	 * The `cypharm_coordinates` filter is applied on first use (at shortcode
+	 * render time), so themes and late-loading plugins can hook into it.
+	 *
+	 * @return array
 	 */
-	public function __construct() {
+	public static function get() {
+		if ( null === self::$coordinates ) {
+			$coordinates       = apply_filters( 'cypharm_coordinates', self::defaults() );
+			self::$coordinates = is_array( $coordinates ) ? $coordinates : array();
+		}
+
+		return self::$coordinates;
+	}
+
+	/**
+	 * The bundled coordinates.
+	 *
+	 * @return array
+	 */
+	private static function defaults() {
+		$cypharm_coordinates = array();
 
 		$cypharm_coordinates['Paphos'] = array(
 			310  => array(
@@ -322,8 +344,6 @@ class CyPharm_Coordinates {
 			),
 		);
 
-		self::$coordinates = apply_filters( 'cypharm_coordinates', $cypharm_coordinates );
+		return $cypharm_coordinates;
 	}
 }
-
-new CyPharm_Coordinates();

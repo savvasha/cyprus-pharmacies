@@ -6,6 +6,8 @@
  * @subpackage Front
  */
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Frontend functionality
  *
@@ -41,26 +43,13 @@ class CyPharm_Front {
 		);
 
 		// Validate city parameter against allowed values.
-		$allowed_cities = array( 'Paphos', 'Limassol', 'Nicosia', 'Larnaca', 'Paralimni' );
-		if ( ! in_array( $atts['city'], $allowed_cities, true ) ) {
+		if ( ! is_string( $atts['city'] ) || ! array_key_exists( $atts['city'], CyPharm_Data::CITIES ) ) {
 			$atts['city'] = 'Paphos';
 		}
 
-		// Initialize Pharmacy Data Class.
-		$cypharm = new CyPharm_Data();
-
-		// Get today pharmacies.
-		$cypharm->date    = gmdate( 'j/n/Y' ) . ',' . gmdate( 'j/n/y' ) . ',' . gmdate( 'd/m/y' ) . ',' . gmdate( 'd/m/Y' );
-		$cypharm->city    = $atts['city'];
-		$today_pharmacies = $cypharm->data();
-
-		// Get tomorrow pharmacies.
-		$cypharm->date       = gmdate( 'j/n/Y', strtotime( '+1 day' ) ) . ',' . gmdate( 'j/n/y', strtotime( '+1 day' ) ) . ',' . gmdate( 'd/m/y', strtotime( '+1 day' ) ) . ',' . gmdate( 'd/m/Y', strtotime( '+1 day' ) );
-		$cypharm->city       = $atts['city'];
-		$tomorrow_pharmacies = $cypharm->data();
-
-		// Get available coordinates.
-		$coordinates = CyPharm_Coordinates::$coordinates;
+		// Today and tomorrow in the timezone the schedule is defined in.
+		$today    = new DateTimeImmutable( 'today', new DateTimeZone( CyPharm_Data::TIMEZONE ) );
+		$tomorrow = $today->modify( '+1 day' );
 
 		$output = '';
 
@@ -69,67 +58,88 @@ class CyPharm_Front {
 			$output .= '<h1>' . esc_html( $atts['title'] ) . '</h1>';
 		}
 
-		// Show today pharmacies.
-		$output .= '<h3>' . date_i18n( 'l' ) . ' , ' . date_i18n( 'j' ) . ' ' . date_i18n( 'M' ) . ' ' . date_i18n( 'Y' ) . '<h3>';
-
-		foreach ( $today_pharmacies as $today_pharmacy ) {
-			if ( isset( $today_pharmacy->reg__no_ ) && isset( $coordinates[ $atts['city'] ][ $today_pharmacy->reg__no_ ] ) && ! isset( $today_pharmacy->geolocation ) ) {
-				$lat              = $coordinates[ $atts['city'] ][ $today_pharmacy->reg__no_ ]['Latitude'];
-				$long             = $coordinates[ $atts['city'] ][ $today_pharmacy->reg__no_ ]['Longitude'];
-				$pharmacy_address = '<a href="http://www.google.com/maps/place/' . esc_attr( $lat ) . ',' . esc_attr( $long ) . '" target="_blank">' . esc_html( $today_pharmacy->address ) . '</a>';
-			} else {
-				$pharmacy_address = esc_html( $today_pharmacy->address );
-			}
-			$output .= '<h4>' . esc_html( $today_pharmacy->surmame ) . ' ' . esc_html( $today_pharmacy->name ) . '</h4>';
-			$output .= '<ul>';
-			$output .= '<li><strong>' . esc_html__( 'Address:', 'cyprus-pharmacies' ) . '</strong> ' . $pharmacy_address . '</li>';
-			if ( isset( $today_pharmacy->additional_address_info ) ) {
-				$output .= '<li><strong>' . esc_html__( 'Additional Address info:', 'cyprus-pharmacies' ) . '</strong> ' . esc_html( $today_pharmacy->additional_address_info ) . '</li>';
-			}
-			if ( isset( $today_pharmacy->muniuciplity__community ) ) {
-				$output .= '<li><strong>' . esc_html__( 'Municipality/Community:', 'cyprus-pharmacies' ) . '</strong> ' . esc_html( $today_pharmacy->muniuciplity__community ) . '</li>';
-			}
-			if ( isset( $today_pharmacy->pharmacy_tel__no_ ) ) {
-				$output .= '<li><strong>' . esc_html__( 'Pharmacy Telephone:', 'cyprus-pharmacies' ) . '</strong> <a href="tel:' . esc_attr( $today_pharmacy->pharmacy_tel__no_ ) . '"> ' . esc_html( $today_pharmacy->pharmacy_tel__no_ ) . ' </a></li>';
-			}
-			if ( isset( $today_pharmacy->house_tel__no_ ) ) {
-				$output .= '<li><strong>' . esc_html__( 'Home Telephone:', 'cyprus-pharmacies' ) . '</strong> <a href="tel:' . esc_attr( $today_pharmacy->house_tel__no_ ) . '"> ' . esc_html( $today_pharmacy->house_tel__no_ ) . ' </a></li>';
-			}
-			$output .= '</ul>';
-		}
-
+		$output .= $this->render_day( $atts['city'], $today );
 		$output .= '<hr>';
+		$output .= $this->render_day( $atts['city'], $tomorrow );
 
-		// Show tomorrow pharmacies.
-		$output .= '<h3>' . date_i18n( 'l', strtotime( '+1 day' ) ) . ' , ' . date_i18n( 'j', strtotime( '+1 day' ) ) . ' ' . date_i18n( 'M', strtotime( '+1 day' ) ) . ' ' . date_i18n( 'Y', strtotime( '+1 day' ) ) . '<h3>';
+		return $output;
+	}
 
-		foreach ( $tomorrow_pharmacies as $tomorrow_pharmacy ) {
-			if ( isset( $tomorrow_pharmacy->reg__no_ ) && isset( $coordinates[ $atts['city'] ][ $tomorrow_pharmacy->reg__no_ ] ) ) {
-				$lat              = $coordinates[ $atts['city'] ][ $tomorrow_pharmacy->reg__no_ ]['Latitude'];
-				$long             = $coordinates[ $atts['city'] ][ $tomorrow_pharmacy->reg__no_ ]['Longitude'];
-				$pharmacy_address = '<a href="http://www.google.com/maps/place/' . esc_attr( $lat ) . ',' . esc_attr( $long ) . '" target="_blank">' . esc_html( $tomorrow_pharmacy->address ) . '</a>';
-			} else {
-				$pharmacy_address = esc_html( $tomorrow_pharmacy->address );
+	/**
+	 * Renders the heading and the pharmacies of one day.
+	 *
+	 * @param string            $city City name (one of CyPharm_Data::CITIES keys).
+	 * @param DateTimeImmutable $day  Midnight of the day, in the schedule timezone.
+	 * @return string
+	 */
+	private function render_day( $city, $day ) {
+		$cypharm       = new CyPharm_Data();
+		$cypharm->city = $city;
+		$cypharm->date = $day->format( 'Y-m-d' );
+		$pharmacies    = $cypharm->data();
+
+		$coordinates = CyPharm_Coordinates::get();
+
+		/* translators: Date format of the day headings, see https://www.php.net/manual/datetime.format.php */
+		$heading_format = __( 'l, j M Y', 'cyprus-pharmacies' );
+
+		$output = '<h3>' . esc_html( wp_date( $heading_format, $day->getTimestamp(), $day->getTimezone() ) ) . '</h3>';
+
+		foreach ( $pharmacies as $pharmacy ) {
+			$reg_no  = self::field( $pharmacy, 'reg__no_' );
+			$address = esc_html( self::field( $pharmacy, 'address' ) );
+
+			if ( '' !== $reg_no && isset( $coordinates[ $city ][ $reg_no ]['Latitude'], $coordinates[ $city ][ $reg_no ]['Longitude'] ) && ! isset( $pharmacy->geolocation ) ) {
+				$lat  = $coordinates[ $city ][ $reg_no ]['Latitude'];
+				$long = $coordinates[ $city ][ $reg_no ]['Longitude'];
+				if ( is_numeric( $lat ) && is_numeric( $long ) ) {
+					$address = '<a href="' . esc_url( 'https://www.google.com/maps/place/' . $lat . ',' . $long ) . '" target="_blank" rel="noopener noreferrer">' . $address . '</a>';
+				}
 			}
-			$output .= '<h4>' . esc_html( $tomorrow_pharmacy->surmame ) . ' ' . esc_html( $tomorrow_pharmacy->name ) . '</h4>';
+
+			$output .= '<h4>' . esc_html( trim( self::field( $pharmacy, 'surmame' ) . ' ' . self::field( $pharmacy, 'name' ) ) ) . '</h4>';
 			$output .= '<ul>';
-			$output .= '<li><strong>' . esc_html__( 'Address:', 'cyprus-pharmacies' ) . '</strong> ' . $pharmacy_address . '</li>';
-			if ( isset( $tomorrow_pharmacy->additional_address_info ) ) {
-				$output .= '<li><strong>' . esc_html__( 'Additional Address info:', 'cyprus-pharmacies' ) . '</strong> ' . esc_html( $tomorrow_pharmacy->additional_address_info ) . '</li>';
+			$output .= '<li><strong>' . esc_html__( 'Address:', 'cyprus-pharmacies' ) . '</strong> ' . $address . '</li>';
+
+			$additional_info = self::field( $pharmacy, 'additional_address_info' );
+			if ( '' !== $additional_info ) {
+				$output .= '<li><strong>' . esc_html__( 'Additional Address info:', 'cyprus-pharmacies' ) . '</strong> ' . esc_html( $additional_info ) . '</li>';
 			}
-			if ( isset( $tomorrow_pharmacy->muniuciplity__community ) ) {
-				$output .= '<li><strong>' . esc_html__( 'Municipality/Community:', 'cyprus-pharmacies' ) . '</strong> ' . esc_html( $tomorrow_pharmacy->muniuciplity__community ) . '</li>';
+
+			$municipality = self::field( $pharmacy, 'muniuciplity__community' );
+			if ( '' !== $municipality ) {
+				$output .= '<li><strong>' . esc_html__( 'Municipality/Community:', 'cyprus-pharmacies' ) . '</strong> ' . esc_html( $municipality ) . '</li>';
 			}
-			if ( isset( $tomorrow_pharmacy->pharmacy_tel__no_ ) ) {
-				$output .= '<li><strong>' . esc_html__( 'Pharmacy Telephone:', 'cyprus-pharmacies' ) . '</strong> <a href="tel:' . esc_attr( $tomorrow_pharmacy->pharmacy_tel__no_ ) . '"> ' . esc_html( $tomorrow_pharmacy->pharmacy_tel__no_ ) . ' </a></li>';
+
+			$pharmacy_tel = self::field( $pharmacy, 'pharmacy_tel__no_' );
+			if ( '' !== $pharmacy_tel ) {
+				$output .= '<li><strong>' . esc_html__( 'Pharmacy Telephone:', 'cyprus-pharmacies' ) . '</strong> <a href="' . esc_url( 'tel:' . $pharmacy_tel, array( 'tel' ) ) . '"> ' . esc_html( $pharmacy_tel ) . ' </a></li>';
 			}
-			if ( isset( $tomorrow_pharmacy->house_tel__no_ ) ) {
-				$output .= '<li><strong>' . esc_html__( 'Home Telephone:', 'cyprus-pharmacies' ) . '</strong> <a href="tel:' . esc_attr( $tomorrow_pharmacy->house_tel__no_ ) . '"> ' . esc_html( $tomorrow_pharmacy->house_tel__no_ ) . ' </a></li>';
+
+			$house_tel = self::field( $pharmacy, 'house_tel__no_' );
+			if ( '' !== $house_tel ) {
+				$output .= '<li><strong>' . esc_html__( 'Home Telephone:', 'cyprus-pharmacies' ) . '</strong> <a href="' . esc_url( 'tel:' . $house_tel, array( 'tel' ) ) . '"> ' . esc_html( $house_tel ) . ' </a></li>';
 			}
+
 			$output .= '</ul>';
 		}
 
 		return $output;
+	}
+
+	/**
+	 * Reads a scalar field of a record as a trimmed string.
+	 *
+	 * @param mixed  $record Pharmacy record.
+	 * @param string $key    Field name.
+	 * @return string Empty string when the field is missing or not scalar.
+	 */
+	private static function field( $record, $key ) {
+		if ( ! is_object( $record ) || ! isset( $record->$key ) || ! is_scalar( $record->$key ) ) {
+			return '';
+		}
+
+		return trim( (string) $record->$key );
 	}
 }
 
