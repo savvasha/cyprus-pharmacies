@@ -7,7 +7,7 @@ Author URI: https://savvasha.com
 Text Domain: cyprus-pharmacies
 Version: 1.3.0
 Requires at least: 5.3
-Requires PHP: 7.4
+Requires PHP: 8.2
 License: GPL v2 or later
 License URI: https://www.gnu.org/licenses/gpl.html
  *

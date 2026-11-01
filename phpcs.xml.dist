@@ -23,7 +23,7 @@
 	<rule ref="WordPress"/>
 
 	<!-- Check PHP cross-version compatibility (minimum supported PHP). -->
-	<config name="testVersion" value="7.4-"/>
+	<config name="testVersion" value="8.2-"/>
 	<rule ref="PHPCompatibilityWP"/>
 
 	<!-- Verify text domain and global prefixes. -->

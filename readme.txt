@@ -4,7 +4,7 @@ License: GPLv2 or later
 Tags: Cyprus, pharmacy, pharmacies, greek, night
 Requires at least: 5.3
 Tested up to: 7.1
-Requires PHP: 7.4
+Requires PHP: 8.2
 Stable tag: 1.3.0
 
 Show all-night today and tomorrow pharmacies of Cyprus
@@ -111,6 +111,7 @@ The plugin requests the on-duty pharmacies schedule from the public API of the N
 * DEV: Removed unused code (`CyPharm_Data::cypharms()`, the `cypharm_pharmacies` filter, unused properties).
 * DEV: `CyPharm_Data::$date` is now a `Y-m-d` date.
 * Readme: Added an "External services" section.
+* Requirement: PHP 8.2 or newer (was 7.4).
 
 = 1.2.9 =
 
